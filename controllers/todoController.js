@@ -14,6 +14,7 @@ const getSingleTodo = async (request, reply) => {
 const getAllTodo = async (request, reply) => {
   const todo = await Todo.find({}).sort({ createdAt: -1 });
   if (!todo.length) {
+    reply.statusCode = 404;
     throw new Error('Empty todos');
   }
   return todo;
