@@ -7,6 +7,7 @@ import {
 } from '../controllers/todoController.js';
 
 async function routes(fastify, opts) {
+  // schema
   fastify.addSchema({
     $id: 'todoSchema',
     type: 'object',
@@ -16,26 +17,16 @@ async function routes(fastify, opts) {
     },
     required: ['name'],
   });
-
-  const todoBodyJsonSchema = {
+  fastify.addSchema({
+    $id: 'todoResponseSchema',
     type: 'object',
     properties: {
-      name: { type: 'string' },
-      isComplete: { type: 'boolean' },
+      success: { type: 'number' },
+      msg: { type: 'string' },
     },
-    required: ['name'],
-  };
+  });
 
-  const todoResponseSchema = {
-    200: {
-      type: 'object',
-      properties: {
-        success: { type: 'number' },
-        msg: { type: 'string' },
-      },
-    },
-  };
-
+  // routes
   fastify.get(
     '/:id',
     {
@@ -54,28 +45,52 @@ async function routes(fastify, opts) {
     getSingleTodo
   );
 
-  fastify.get('/', getAllTodo);
+  fastify.get(
+    '/',
+    {
+      schema: {
+        response: {
+          200: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                _id: { type: 'string' },
+                name: { $ref: 'todoSchema#/properties/name' },
+                isComplete: {
+                  $ref: 'todoSchema#/properties/isComplete',
+                },
+                updatedAt: { type: 'string' },
+              },
+            },
+          },
+        },
+      },
+    },
+    getAllTodo
+  );
 
   fastify.post(
     '/',
     {
       schema: {
-        body: todoBodyJsonSchema,
-        response: todoResponseSchema,
+        body: { $ref: 'todoSchema#' },
+        response: {
+          200: { $ref: 'todoResponseSchema#' },
+        },
       },
     },
     addTodo
   );
-  // fastify.post('/', (request, reply) => {
-  //   return request.body;
-  // });
 
   fastify.put(
     '/:id',
     {
       schema: {
-        body: todoBodyJsonSchema,
-        response: todoResponseSchema,
+        body: { $ref: 'todoSchema#' },
+        response: {
+          200: { $ref: 'todoResponseSchema#' },
+        },
       },
     },
     updateTodo
@@ -91,7 +106,9 @@ async function routes(fastify, opts) {
             id: { type: 'string' },
           },
         },
-        response: todoResponseSchema,
+        response: {
+          200: { $ref: 'todoResponseSchema#' },
+        },
       },
     },
     deleteTodo
