@@ -23,7 +23,11 @@ const getAllTodo = async (request, reply) => {
 const addTodo = async (request, reply) => {
   const todo = await Todo.create(request.body);
   console.log(todo);
-  return { success: 1, msg: `Successfully added todo - id: ${todo._id}` };
+  return {
+    success: 1,
+    msg: `Successfully added todo - id: ${todo._id}`,
+    todo,
+  };
 };
 
 const updateTodo = async (request, reply) => {

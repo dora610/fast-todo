@@ -17,6 +17,7 @@
     "mongoose": "^6.2.9"
   },
   "devDependencies": {
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "pino-pretty": "^7.6.0"
   }
 }
